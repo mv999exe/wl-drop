@@ -1,0 +1,5 @@
+{
+  "name": "WL Drop",
+  "description": "A modern, professional UI for a file sharing application with auto-device detection, file/folder support, and persistent user settings.",
+  "requestFramePermissions": []
+}
