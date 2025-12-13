@@ -53,8 +53,9 @@ const Header: React.FC<HeaderProps> = ({ user, onEditProfile }) => {
 
         {/* Buy Me Coffee Image Button */}
         <a 
-          href="#" 
-          onClick={(e) => e.preventDefault()} 
+          href="https://buymeacoffee.com/mv999exe" 
+          target="_blank"
+          rel="noopener noreferrer"
           className="transition-transform hover:scale-105 active:scale-95 flex items-center"
           title="Buy me a coffee"
         >
