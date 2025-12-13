@@ -48,7 +48,6 @@ Source: "..\build\python-embed\*"; DestDir: "{app}\python"; Flags: ignoreversion
 Source: "..\dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\backend\*"; DestDir: "{app}\backend"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\run.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\tray_app.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\requirements.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\logo.png"; DestDir: "{app}"; Flags: ignoreversion
@@ -56,7 +55,6 @@ Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 ; Launcher Scripts
 Source: "..\installer\WL-Drop-Launcher.bat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\installer\WL-Drop-Silent.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\installer\WL-Drop.vbs"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]

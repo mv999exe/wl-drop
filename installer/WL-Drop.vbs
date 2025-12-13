@@ -4,22 +4,29 @@ Set fso = CreateObject("Scripting.FileSystemObject")
 ' Get the directory where this VBS file is located
 scriptDir = fso.GetParentFolderName(WScript.ScriptFullName)
 
-' Set Python path
+' Set paths
 pythonDir = scriptDir & "\python"
-pythonwExe = pythonDir & "\pythonw.exe"
 pythonExe = pythonDir & "\python.exe"
-trayScript = scriptDir & "\tray_app.py"
+runScript = scriptDir & "\run.py"
+uploadsDir = scriptDir & "\uploads"
 
-' Check if pythonw.exe exists (for full Python) or use python.exe (for embedded)
-Dim pythonCmd
-If fso.FileExists(pythonwExe) Then
-    pythonCmd = """" & pythonwExe & """ """ & trayScript & """"
-Else
-    pythonCmd = """" & pythonExe & """ """ & trayScript & """"
+' Create uploads directory if needed
+If Not fso.FolderExists(uploadsDir) Then
+    fso.CreateFolder(uploadsDir)
 End If
 
-' Run completely hidden (0 = hidden window, False = don't wait)
-WshShell.Run pythonCmd, 0, False
+' Build command to run Python directly
+Dim cmd
+cmd = """" & pythonExe & """ """ & runScript & """"
+
+' Run Python completely hidden (0 = hidden window, False = don't wait)
+WshShell.Run cmd, 0, False
+
+' Wait a moment for server to start
+WScript.Sleep 2000
+
+' Open browser
+WshShell.Run "http://localhost:8000", 1, False
 
 ' Exit VBScript
 Set WshShell = Nothing
