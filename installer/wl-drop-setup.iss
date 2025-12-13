@@ -19,10 +19,10 @@ AppUpdatesURL={#MyAppURL}/releases
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=..\LICENSE
+; LicenseFile=..\LICENSE
 OutputDir=..\release
 OutputBaseFilename=wl-drop-v{#MyAppVersion}-windows-setup
-SetupIconFile=..\assets\logo.ico
+; SetupIconFile=..\assets\logo.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -33,10 +33,6 @@ ArchitecturesInstallIn64BitMode=x64
 ; Uninstall
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallFilesDir={app}\uninstall
-
-; Visual
-WizardImageFile=compiler:WizModernImage-IS.bmp
-WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -58,14 +54,12 @@ Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 ; Launcher Script
 Source: "..\installer\WL-Drop-Launcher.bat"; DestDir: "{app}"; Flags: ignoreversion
-; Icon
-Source: "..\assets\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; IconFilename: "{app}\logo.ico"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; IconFilename: "{app}\logo.ico"; Tasks: quicklaunchicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; Tasks: quicklaunchicon
 
 [Run]
 ; Install Python dependencies after installation

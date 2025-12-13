@@ -79,12 +79,6 @@ jobs:
           Remove-Item "build\python-embed\get-pip.py"
         shell: pwsh
       
-      - name: Create Assets Directory
-        run: |
-          New-Item -ItemType Directory -Path "assets" -Force
-          Copy-Item "logo.ico" "assets\logo.ico"
-        shell: pwsh
-      
       - name: Install Inno Setup
         run: |
           choco install innosetup -y
