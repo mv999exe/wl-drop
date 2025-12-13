@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🎯 More professional approach: no files left behind after successful transfers
 - 🔧 Simplified cleanup service to manual utilities only
 
+### Added
+- ☕ Buy Me a Coffee support button with working link
+
+### Fixed
+- 🔗 Buy Me a Coffee button now links to https://buymeacoffee.com/mv999exe
+
 ### Removed
 - ❌ Automatic hourly cleanup service (replaced with instant cleanup)
 - ❌ AUTO_CLEANUP_HOURS configuration setting (no longer needed)
