@@ -1,6 +1,6 @@
 @echo off
-REM WL-Drop Launcher
-REM This script launches WL-Drop using the embedded Python
+REM WL-Drop Launcher - Debug Mode
+REM Shows console window for debugging
 
 cd /d "%~dp0"
 
@@ -8,29 +8,59 @@ REM Set Python path
 set PYTHON_HOME=%~dp0python
 set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
 
+echo.
+echo ============================================================
+echo    WL-Drop - Debug Mode
+echo ============================================================
+echo.
+echo Python Home: %PYTHON_HOME%
+echo.
+
+REM Check if Python exists
+if not exist "%PYTHON_HOME%\python.exe" (
+    echo ERROR: Python not found at %PYTHON_HOME%
+    echo Please reinstall WL-Drop
+    pause
+    exit /b 1
+)
+
+echo Python found: %PYTHON_HOME%\python.exe
+echo.
+
 REM Create uploads directory if it doesn't exist
-if not exist "uploads" mkdir uploads
+if not exist "uploads" (
+    echo Creating uploads directory...
+    mkdir uploads
+)
+
+REM Check if dependencies are installed
+echo Checking dependencies...
+"%PYTHON_HOME%\python.exe" -c "import fastapi" 2>nul
+if errorlevel 1 (
+    echo.
+    echo Installing dependencies... This may take a minute.
+    echo.
+    "%PYTHON_HOME%\python.exe" -m pip install --no-warn-script-location -r requirements.txt
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Failed to install dependencies
+        echo.
+        pause
+        exit /b 1
+    )
+)
+
+echo Dependencies OK
+echo.
 
 REM Start WL-Drop
+echo Starting WL-Drop server...
 echo.
-echo ============================================================
-echo    Starting WL-Drop...
-echo ============================================================
-echo.
+echo ------------------------------------------------------------
+"%PYTHON_HOME%\python.exe" run.py
 
-start "" "%PYTHON_HOME%\python.exe" run.py
-
-REM Wait a bit for server to start
-timeout /t 3 /nobreak >nul
-
-REM Open browser
-start http://localhost:8000
-
+REM If we get here, server stopped
 echo.
-echo WL-Drop is running!
-echo Your browser should open automatically.
-echo.
-echo If not, open: http://localhost:8000
-echo.
-echo Press Ctrl+C in the Python window to stop the server.
-echo.
+echo ------------------------------------------------------------
+echo Server stopped.
+pause

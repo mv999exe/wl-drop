@@ -30,6 +30,7 @@ a = Analysis(
         'pydantic_core',
         'aiofiles',
         'python_multipart',
+        'psutil',
     ],
     hookspath=[],
     hooksconfig={},

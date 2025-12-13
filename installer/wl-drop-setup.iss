@@ -36,7 +36,6 @@ UninstallFilesDir={app}\uninstall
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "arabic"; MessagesFile: "compiler:Languages\Arabic.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -52,20 +51,22 @@ Source: "..\run.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\requirements.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
-; Launcher Script
+; Launcher Scripts
 Source: "..\installer\WL-Drop-Launcher.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\installer\WL-Drop-Silent.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\installer\WL-Drop.vbs"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop-Launcher.bat"; Tasks: quicklaunchicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Tasks: quicklaunchicon
 
 [Run]
-; Install Python dependencies after installation
+; Install Python dependencies (pip is already installed in CurStepChanged)
 Filename: "{app}\python\python.exe"; Parameters: "-m pip install --no-warn-script-location -r ""{app}\requirements.txt"""; StatusMsg: "Installing Python dependencies..."; Flags: runhidden
 ; Offer to launch after installation
-Filename: "{app}\WL-Drop-Launcher.bat"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 var
@@ -89,6 +90,8 @@ begin
     DownloadPage.Clear;
     // Download Python Embedded (Small, portable Python)
     DownloadPage.Add('https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip', 'python-embed.zip', '');
+    // Download get-pip.py for embedded Python
+    DownloadPage.Add('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py', '');
     DownloadPage.Show;
     try
       try
@@ -111,7 +114,8 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ResultCode: Integer;
-  PythonZip, ExtractPath: String;
+  PythonZip, ExtractPath, PthFile, PthContent: String;
+  Lines: TArrayOfString;
 begin
   if CurStep = ssPostInstall then begin
     // Extract Python Embedded
@@ -123,6 +127,22 @@ begin
       Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), 
         '-Command "Expand-Archive -Path ''' + PythonZip + ''' -DestinationPath ''' + ExtractPath + ''' -Force"',
         '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      
+      // Enable site-packages in embedded Python by modifying python311._pth
+      PthFile := ExtractPath + '\python311._pth';
+      if FileExists(PthFile) then begin
+        LoadStringsFromFile(PthFile, Lines);
+        SaveStringToFile(PthFile, 'python311.zip' + #13#10 + '.' + #13#10 + 'import site' + #13#10, False);
+        Log('Enabled site-packages in embedded Python');
+      end;
+      
+      // Install pip using get-pip.py
+      if FileExists(ExpandConstant('{tmp}\get-pip.py')) then begin
+        Log('Installing pip...');
+        Exec(ExtractPath + '\python.exe', 
+          ExpandConstant('"{tmp}\get-pip.py"'),
+          ExtractPath, SW_HIDE, ewWaitUntilTerminated, ResultCode);
+      end;
     end;
     
     // Create uploads directory

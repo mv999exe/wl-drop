@@ -15,14 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - ☕ Buy Me a Coffee support button with working link
+- 🪟 **Professional Windows Installer** - Inno Setup based installer for Windows
+- 🐧 **Linux .deb Package** - Professional Debian package for Linux
+- 🔇 **Silent Background Operation** - No CMD window visible to users
+- 🔄 **Auto-Shutdown** - Server automatically stops when browser closes
 - 📦 **Distribution Build System** - Create standalone executables for Windows & Linux
 - 🛠️ build.sh and build.bat scripts for building distributions
 - 📖 BUILD.md - Comprehensive build documentation
-- 🚀 Pre-built executables available in Releases (no Python/Node.js needed!)
+- 🚀 Pre-built installers available in Releases (no Python/Node.js needed!)
 - 📚 Updated documentation with clear sections for end users vs developers
+- 🤖 GitHub Actions workflow for automated release builds
 
 ### Fixed
 - 🔗 Buy Me a Coffee button now links to https://buymeacoffee.com/mv999exe
+- 🐍 Embedded Python pip installation in Windows installer
+- 💾 Dependencies now install correctly during installation
 
 ### Removed
 - ❌ Automatic hourly cleanup service (replaced with instant cleanup)
@@ -33,15 +40,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Transfer directories deleted immediately upon successful file download
 - Reduced server maintenance overhead
 - Cleaner uploads folder management
-- PyInstaller integration for creating standalone executables
-- Enhanced .spec file with all required dependencies
+- VBScript launcher for silent Windows operation
+- Browser process monitoring for auto-shutdown (psutil)
+- Embedded Python 3.11.9 with proper pip installation
+- get-pip.py integration for embedded Python environments
+- Modified python311._pth to enable site-packages
+- Inno Setup installer with download wizard for Python runtime
 - GitHub Actions workflow for automated releases
 
 ### For End Users
-- 📥 Download ready-to-use executables from [Releases](https://github.com/mv999exe/wl-drop/releases)
-- 🪟 Windows: Extract ZIP and run `WL-Drop.bat`
-- 🐧 Linux: Extract tar.gz and run `./run.sh`
-- ✨ No installation, no Python, no Node.js required!
+- 📥 Download ready-to-use installers from [Releases](https://github.com/mv999exe/wl-drop/releases)
+- 🪟 Windows: Run setup.exe installer (installs to Program Files like normal software)
+- 🐧 Linux: Install .deb package with `sudo dpkg -i wl-drop*.deb`
+- ✨ No technical knowledge required - just install and use!
+- 🔇 Runs silently in background - no console windows
+- 🔄 Auto-stops when you close the browser
 
 ### For Developers
 - 🔨 Use `./build.sh` (Linux) or `build.bat` (Windows) to create distributions

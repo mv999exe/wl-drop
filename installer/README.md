@@ -22,8 +22,11 @@
 After installation:
 - Find "WL-Drop" icon on your Desktop or in Start Menu
 - Double-click to launch
+- Application runs silently in background (no console window)
 - Your browser opens automatically
 - Start sharing files!
+
+**Note**: The application will automatically stop when you close the browser.
 
 ### What Gets Installed
 
@@ -79,9 +82,13 @@ npm run build
 
 The installer includes:
 - **Python Embedded** (3.11.9): Portable Python runtime (~10MB)
+- **get-pip.py**: pip installer for embedded Python
 - **Application Files**: Frontend + Backend code
-- **Dependencies**: Installed via pip during setup
-- **Launcher Script**: Starts the server and opens browser
+- **Dependencies**: Installed via pip during setup (FastAPI, psutil, etc.)
+- **Launcher Scripts**: 
+  - WL-Drop.vbs (VBScript for silent operation)
+  - WL-Drop-Silent.bat (Silent launcher using pythonw.exe)
+  - WL-Drop-Launcher.bat (Debug launcher with console output)
 - **Shortcuts**: Desktop + Start Menu
 
 ### Configuration
@@ -111,6 +118,8 @@ After building:
 ✅ **Proper Uninstall**: Via Windows Settings  
 ✅ **Start Menu Integration**: Easy to find and launch  
 ✅ **Desktop Shortcut**: Quick access  
+✅ **Silent Operation**: No console windows visible
+✅ **Auto-Shutdown**: Stops when browser closes
 ✅ **Auto-updates** (future): Can check for updates  
 ✅ **User Familiar**: Standard installation process  
 
@@ -152,12 +161,16 @@ C:\Program Files\WL-Drop\
 ### How It Works
 
 1. **Installation**: Inno Setup extracts files and downloads Python
-2. **Dependencies**: Pip installs required packages
-3. **Launch**: Launcher script:
+2. **pip Setup**: get-pip.py installs pip in embedded Python
+3. **Dependencies**: Pip installs required packages (FastAPI, etc.)
+4. **Launch**: VBScript launcher (WL-Drop.vbs):
+   - Runs silently (no console window)
+   - Calls silent batch script
    - Sets Python path
    - Creates uploads directory
-   - Starts FastAPI server
+   - Starts server using pythonw.exe (windowless Python)
    - Opens browser
+5. **Auto-Shutdown**: Server monitors browser process and stops when browser closes
 
 ### Security
 
@@ -177,17 +190,25 @@ C:\Program Files\WL-Drop\
 
 ### App won't start
 - Check if port 8000 is available
-- Look for error in console window
+- Run WL-Drop-Launcher.bat (debug version) to see error messages
 - Check firewall settings
+- Verify Python installed in: C:\Program Files\WL-Drop\python\
 
 ### Browser doesn't open
 - Manually open: http://localhost:8000
-- Check if server started (console window)
+- Check if server started (run debug launcher)
+- Try different browser
 
 ### Dependencies fail to install
-- Check internet connection
+- Check internet connection during installation
 - Firewall may block pip downloads
-- Try running as Administrator
+- Try running installer as Administrator
+- Check if pip works: Open CMD in installation folder and run: `python\python.exe -m pip --version`
+
+### Console window appears
+- Normal installer uses WL-Drop.vbs (silent)
+- If you see console, you're running WL-Drop-Launcher.bat (debug version)
+- Use the Desktop shortcut or Start Menu entry instead
 
 ---
 

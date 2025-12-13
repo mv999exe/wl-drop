@@ -84,6 +84,13 @@ jobs:
           choco install innosetup -y
         shell: pwsh
       
+      - name: Copy Launcher Files
+        run: |
+          Copy-Item "installer\WL-Drop-Launcher.bat" -Destination "."
+          Copy-Item "installer\WL-Drop-Silent.bat" -Destination "."
+          Copy-Item "installer\WL-Drop.vbs" -Destination "."
+        shell: pwsh
+      
       - name: Build Installer
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\wl-drop-setup.iss"
