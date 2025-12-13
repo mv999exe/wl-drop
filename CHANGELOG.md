@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - ☕ Buy Me a Coffee support button with working link
+- 📦 **Distribution Build System** - Create standalone executables for Windows & Linux
+- 🛠️ build.sh and build.bat scripts for building distributions
+- 📖 BUILD.md - Comprehensive build documentation
+- 🚀 Pre-built executables available in Releases (no Python/Node.js needed!)
+- 📚 Updated documentation with clear sections for end users vs developers
 
 ### Fixed
 - 🔗 Buy Me a Coffee button now links to https://buymeacoffee.com/mv999exe
@@ -28,6 +33,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Transfer directories deleted immediately upon successful file download
 - Reduced server maintenance overhead
 - Cleaner uploads folder management
+- PyInstaller integration for creating standalone executables
+- Enhanced .spec file with all required dependencies
+- GitHub Actions workflow for automated releases
+
+### For End Users
+- 📥 Download ready-to-use executables from [Releases](https://github.com/mv999exe/wl-drop/releases)
+- 🪟 Windows: Extract ZIP and run `WL-Drop.bat`
+- 🐧 Linux: Extract tar.gz and run `./run.sh`
+- ✨ No installation, no Python, no Node.js required!
+
+### For Developers
+- 🔨 Use `./build.sh` (Linux) or `build.bat` (Windows) to create distributions
+- 📖 See BUILD.md for detailed build instructions
+- 🛠️ Full source code available for modifications
 
 ---
 
