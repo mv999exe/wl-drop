@@ -5,6 +5,25 @@ All notable changes to WL-Drop will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-12-13
+
+### Added
+- 💓 **Heartbeat Auto-Shutdown** - Server automatically shuts down 10 seconds after browser tab closes
+- 🔄 Frontend sends heartbeat every 2 seconds to keep server alive
+- 🛑 No more manual server shutdown needed - just close the browser tab!
+- ⚡ 30-second grace period on startup for initial connection
+
+### Changed
+- 🎯 Simplified auto-shutdown mechanism using heartbeat instead of process monitoring
+- 🧹 Removed psutil dependency - no longer needed
+- 📦 Smaller dependency footprint for faster installation
+
+### Technical Details
+- Backend monitors last heartbeat timestamp
+- Frontend POST to `/api/heartbeat` every 2 seconds
+- Server shuts down gracefully after 10 seconds of no heartbeat
+- Cleanup on tab close/unmount stops heartbeat automatically
+
 ## [1.1.0] - 2025-12-13
 
 ### Changed

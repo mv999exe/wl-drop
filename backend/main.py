@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.core.config import settings
 from backend.api import files, devices
 from backend.core.websocket_manager import ws_manager
+from backend.core.shutdown import shutdown_manager
 
 
 @asynccontextmanager
@@ -25,6 +26,9 @@ async def lifespan(app: FastAPI):
     
     # Ensure upload directory exists
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    
+    # Start auto-shutdown monitor
+    asyncio.create_task(shutdown_manager.monitor())
     
     yield
     
@@ -79,6 +83,14 @@ async def health_check():
         "version": "1.1.0",
         "server": f"{local_ip}:{settings.PORT}"
     }
+
+
+# Heartbeat endpoint for auto-shutdown
+@app.post("/api/heartbeat")
+async def heartbeat():
+    """Receive heartbeat from active browser tabs"""
+    shutdown_manager.heartbeat()
+    return {"status": "ok"}
 
 
 # Serve React frontend

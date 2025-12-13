@@ -52,11 +52,22 @@ function App() {
       wsClient.current.connect(currentUser, AppMode.HOME);
     }
     
+    // 6. Setup heartbeat to keep server alive
+    const heartbeatInterval = setInterval(async () => {
+      try {
+        await fetch('/api/heartbeat', { method: 'POST' });
+      } catch (error) {
+        // Ignore errors - server might be shutting down
+      }
+    }, 2000); // Send heartbeat every 2 seconds
+    
     return () => {
       // Cleanup WebSocket on unmount
       if (wsClient.current) {
         wsClient.current.disconnect();
       }
+      // Stop heartbeat
+      clearInterval(heartbeatInterval);
     };
   }, []);
   
