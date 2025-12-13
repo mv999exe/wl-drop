@@ -7,12 +7,26 @@ scriptDir = fso.GetParentFolderName(WScript.ScriptFullName)
 ' Set paths
 pythonDir = scriptDir & "\python"
 pythonExe = pythonDir & "\python.exe"
-trayScript = scriptDir & "\tray_app.py"
+runScript = scriptDir & "\run.py"
+uploadsDir = scriptDir & "\uploads"
 
-' Run tray app completely hidden (0 = hidden window, False = don't wait)
+' Create uploads directory if needed
+If Not fso.FolderExists(uploadsDir) Then
+    fso.CreateFolder(uploadsDir)
+End If
+
+' Build command to run Python directly
 Dim cmd
-cmd = """" & pythonExe & """ """ & trayScript & """"
+cmd = """" & pythonExe & """ """ & runScript & """"
+
+' Run Python completely hidden (0 = hidden window, False = don't wait)
 WshShell.Run cmd, 0, False
+
+' Wait a moment for server to start
+WScript.Sleep 2000
+
+' Open browser
+WshShell.Run "http://localhost:8000", 1, False
 
 ' Exit VBScript
 Set WshShell = Nothing

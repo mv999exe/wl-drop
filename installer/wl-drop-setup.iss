@@ -48,7 +48,6 @@ Source: "..\build\python-embed\*"; DestDir: "{app}\python"; Flags: ignoreversion
 Source: "..\dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\backend\*"; DestDir: "{app}\backend"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\run.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\tray_app.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\requirements.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\logo.png"; DestDir: "{app}"; Flags: ignoreversion
