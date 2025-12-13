@@ -34,13 +34,32 @@ class WLDropTray:
         self.base_url = "http://localhost:8000"
         
     def create_icon_image(self):
-        """Create lightning bolt icon matching website design"""
+        """Load the official WL-Drop logo"""
+        try:
+            # Try to load the PNG logo file
+            script_dir = Path(__file__).parent
+            logo_path = script_dir / "logo.png"
+            
+            if logo_path.exists():
+                image = Image.open(logo_path)
+                # Resize to 64x64 for system tray
+                image = image.resize((64, 64), Image.Resampling.LANCZOS)
+                return image
+            else:
+                # Fallback: create simple icon if logo not found
+                return self.create_fallback_icon()
+        except Exception as e:
+            print(f"Error loading logo: {e}")
+            return self.create_fallback_icon()
+    
+    def create_fallback_icon(self):
+        """Create a simple fallback icon"""
         width = 64
         height = 64
-        image = Image.new('RGBA', (width, height), (99, 102, 241, 255))  # #6366f1
+        image = Image.new('RGBA', (width, height), (99, 102, 241, 255))
         draw = ImageDraw.Draw(image)
         
-        # Lightning bolt (scaled from 24x24 SVG path)
+        # Simple lightning bolt
         scale = width / 24.0
         lightning = [
             (13 * scale, 3 * scale),
