@@ -1,6 +1,6 @@
 @echo off
 REM WL-Drop Silent Launcher
-REM Runs in background without console window
+REM Runs System Tray application
 
 cd /d "%~dp0"
 
@@ -12,20 +12,17 @@ REM Create uploads directory
 if not exist "uploads" mkdir uploads 2>nul
 
 REM Check and install dependencies silently if needed
-"%PYTHON_HOME%\python.exe" -c "import fastapi" 2>nul
+"%PYTHON_HOME%\python.exe" -c "import fastapi, pystray" 2>nul
 if errorlevel 1 (
     "%PYTHON_HOME%\python.exe" -m pip install --no-warn-script-location -q -r requirements.txt
 )
 
-REM Start server in background using pythonw.exe (no console window)
-REM pythonw.exe doesn't create a console window at all
-start "" "%PYTHON_HOME%\pythonw.exe" run.py
+REM Start System Tray application (no console window)
+start "" "%PYTHON_HOME%\pythonw.exe" tray_app.py 2>nul
+if errorlevel 1 (
+    REM pythonw.exe not available in embedded Python, use workaround
+    start "" /min "%PYTHON_HOME%\python.exe" tray_app.py
+)
 
-REM Wait for server to start (2 seconds)
-ping 127.0.0.1 -n 3 >nul
-
-REM Open browser
-start http://localhost:8000
-
-REM Exit this script (server keeps running via pythonw.exe)
+REM Exit this script (tray app keeps running)
 exit

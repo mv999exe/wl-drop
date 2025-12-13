@@ -22,7 +22,7 @@ AllowNoIcons=yes
 ; LicenseFile=..\LICENSE
 OutputDir=..\release
 OutputBaseFilename=wl-drop-v{#MyAppVersion}-windows-setup
-; SetupIconFile=..\assets\logo.ico
+SetupIconFile=..\logo.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -31,7 +31,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 ; Uninstall
-UninstallDisplayIcon={app}\{#MyAppExeName}
+UninstallDisplayIcon={app}\logo.ico
 UninstallFilesDir={app}\uninstall
 
 [Languages]
@@ -48,7 +48,10 @@ Source: "..\build\python-embed\*"; DestDir: "{app}\python"; Flags: ignoreversion
 Source: "..\dist\*"; DestDir: "{app}\dist"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\backend\*"; DestDir: "{app}\backend"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\run.py"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\tray_app.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\requirements.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\logo.png"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 ; Launcher Scripts
@@ -57,10 +60,10 @@ Source: "..\installer\WL-Drop-Silent.bat"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\installer\WL-Drop.vbs"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Tasks: quicklaunchicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: quicklaunchicon
 
 [Run]
 ; Install Python dependencies (pip is already installed in CurStepChanged)

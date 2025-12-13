@@ -17,8 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ☕ Buy Me a Coffee support button with working link
 - 🪟 **Professional Windows Installer** - Inno Setup based installer for Windows
 - 🐧 **Linux .deb Package** - Professional Debian package for Linux
+- 🎨 **System Tray Application** - Professional background app with icon in system tray
 - 🔇 **Silent Background Operation** - No CMD window visible to users
-- 🔄 **Auto-Shutdown** - Server automatically stops when browser closes
+- 🔄 **Smart Auto-Shutdown** - Server monitors active browser tabs and stops when last tab closes
+- 🎯 **Tray Menu** - Start/Stop server, Open browser, Exit - all from system tray
+- 🖼️ **Professional Icon** - Custom WL-Drop logo (.ico + .png)
 - 📦 **Distribution Build System** - Create standalone executables for Windows & Linux
 - 🛠️ build.sh and build.bat scripts for building distributions
 - 📖 BUILD.md - Comprehensive build documentation
@@ -30,36 +33,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔗 Buy Me a Coffee button now links to https://buymeacoffee.com/mv999exe
 - 🐍 Embedded Python pip installation in Windows installer
 - 💾 Dependencies now install correctly during installation
+- 🪟 pythonw.exe issue in embedded Python (replaced with VBScript + tray app)
 
 ### Removed
 - ❌ Automatic hourly cleanup service (replaced with instant cleanup)
 - ❌ AUTO_CLEANUP_HOURS configuration setting (no longer needed)
 
 ### Technical Details
+- **System Tray App**: pystray-based application with professional UI
+- **Smart Monitoring**: Checks for active browser connections every 2 seconds
+- **Grace Period**: 10-second grace period before auto-shutdown (prevents false positives)
+- **Health Check**: /api/health endpoint for monitoring
 - Background tasks now handle cleanup after each download
 - Transfer directories deleted immediately upon successful file download
 - Reduced server maintenance overhead
 - Cleaner uploads folder management
-- VBScript launcher for silent Windows operation
-- Browser process monitoring for auto-shutdown (psutil)
+- VBScript launcher for silent Windows operation (no console windows)
+- Browser tab monitoring for intelligent auto-shutdown
 - Embedded Python 3.11.9 with proper pip installation
 - get-pip.py integration for embedded Python environments
 - Modified python311._pth to enable site-packages
 - Inno Setup installer with download wizard for Python runtime
 - GitHub Actions workflow for automated releases
+- Multi-size .ico icon (16x16 to 256x256)
 
 ### For End Users
 - 📥 Download ready-to-use installers from [Releases](https://github.com/mv999exe/wl-drop/releases)
-- 🪟 Windows: Run setup.exe installer (installs to Program Files like normal software)
+- 🪟 Windows: Run setup.exe installer
+  - Installs to Program Files like normal software
+  - Creates system tray icon - NO console windows!
+  - Auto-starts server when clicked
+  - Auto-stops when you close browser
+  - Professional icon in system tray with Start/Stop menu
 - 🐧 Linux: Install .deb package with `sudo dpkg -i wl-drop*.deb`
 - ✨ No technical knowledge required - just install and use!
-- 🔇 Runs silently in background - no console windows
-- 🔄 Auto-stops when you close the browser
+- 🔇 Runs completely silently in background
+- 🔄 Smart auto-stop when you close the browser tab
 
 ### For Developers
 - 🔨 Use `./build.sh` (Linux) or `build.bat` (Windows) to create distributions
 - 📖 See BUILD.md for detailed build instructions
 - 🛠️ Full source code available for modifications
+- 🎨 System tray app: `tray_app.py` with pystray
+- 🖼️ Icon generator: `create_icon.py`
 
 ---
 
