@@ -54,21 +54,13 @@ const SenderView: React.FC<SenderViewProps> = ({ onBack, user, wsClient }) => {
     e.preventDefault();
     setIsDragging(false);
     
-    // Simple drag drop logic for demo (mostly files)
-    // Full folder traverse in drag-drop requires FileSystemEntry API recursion
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-  const processFiles = (fileList: FileList) => {
-    setFiles(prev => [...prev, ...Array.from(fileList)]);
+      processFiles(e.dataTransfer.files);
+    }
   };
 
   const processFiles = (fileList: FileList) => {
-    const newFiles: FileItem[] = Array.from(fileList).map(f => ({
-      name: f.name,
-      size: f.size,
-      type: f.type || 'unknown',
-      path: f.webkitRelativePath || f.name
-    }));
-    setFiles(prev => [...prev, ...newFiles]);
+    setFiles(prev => [...prev, ...Array.from(fileList)]);
   };
 
   const removeFile = (index: number) => {
@@ -77,76 +69,67 @@ const SenderView: React.FC<SenderViewProps> = ({ onBack, user, wsClient }) => {
 
   const triggerInput = () => {
     if (fileInputRef.current) {
-        // Reset value to allow selecting same folder/files again
-        fileInputRef.current.value = '';
-        fileInputRef.current.click();
-    }
-  const triggerInput = () => {
-    if (fileInputRef.current) {
-        // Reset value to allow selecting same folder/files again
-        fileInputRef.current.value = '';
-        fileInputRef.current.click();
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
     }
   };
-  
-  const handleSendFiles = async () => {
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files);
+    }
+  };
+
+  const handleSend = async () => {
     if (!selectedReceiver || files.length === 0) {
       alert('Please select files and a receiver');
       return;
     }
-    
-    setUploading(true);
-    setUploadProgress(0);
-    
+
     try {
-      const transferId = crypto.randomUUID();
+      setUploading(true);
+      setUploadProgress(0);
+
+      // Generate transfer ID
+      const transferId = `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Upload files to server
-      const formData = new FormData();
-      formData.append('sender_id', user.id);
-      formData.append('transfer_id', transferId);
-      
-      let uploadedCount = 0;
-      for (const file of files) {
-        const fileFormData = new FormData();
-        fileFormData.append('file', file);
-        fileFormData.append('sender_id', user.id);
-        fileFormData.append('transfer_id', transferId);
+      // Upload files one by one
+      const totalFiles = files.length;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('sender_id', user.id);
+        formData.append('transfer_id', transferId);
         
-        if (file.webkitRelativePath) {
-          fileFormData.append('relative_path', file.webkitRelativePath);
+        // Add relative path if it exists (for folders)
+        if ((file as any).webkitRelativePath) {
+          formData.append('relative_path', (file as any).webkitRelativePath);
         }
-        
-        const response = await fetch(API_ENDPOINTS.UPLOAD_FILE, {
+
+        const uploadResponse = await fetch(API_ENDPOINTS.UPLOAD_FILE, {
           method: 'POST',
-          body: fileFormData,
+          body: formData,
         });
+
+        if (!uploadResponse.ok) throw new Error(`Failed to upload ${file.name}`);
         
-        if (!response.ok) {
-          throw new Error(`Failed to upload ${file.name}`);
-        }
-        
-        uploadedCount++;
-        setUploadProgress((uploadedCount / files.length) * 100);
+        // Update progress
+        setUploadProgress(Math.round(((i + 1) / totalFiles) * 80));
       }
-      
-      // Initiate transfer via API
-      const fileMetadata = files.map(f => ({
-        name: f.name,
-        size: f.size,
-        type: f.type,
-        path: f.webkitRelativePath || f.name
-      }));
-      
+
+      // Initiate transfer
+      const transferData = new FormData();
+      transferData.append('sender_id', user.id);
+      transferData.append('receiver_id', selectedReceiver);
+      transferData.append('transfer_id', transferId);
+
       const transferResponse = await fetch(API_ENDPOINTS.INITIATE_TRANSFER, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          senderId: user.id,
-          receiverId: selectedReceiver,
-          files: fileMetadata
-        })
+        body: transferData,
       });
+      
+      setUploadProgress(100);
       
       if (transferResponse.ok) {
         alert('Files sent successfully!');
@@ -161,7 +144,13 @@ const SenderView: React.FC<SenderViewProps> = ({ onBack, user, wsClient }) => {
       setUploading(false);
       setUploadProgress(0);
     }
-  };    className="self-start mb-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors py-2"
+  };
+
+  return (
+    <div className="flex-1 flex flex-col">
+      <button 
+        onClick={onBack}
+        className="self-start mb-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors py-2"
       >
         <ArrowLeft className="w-5 h-5" />
         <span>Back to Home</span>
@@ -191,146 +180,150 @@ const SenderView: React.FC<SenderViewProps> = ({ onBack, user, wsClient }) => {
 
         {/* Drop Zone */}
         <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={triggerInput}
-            className={`
-                group relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300
-                ${isDragging 
-                    ? 'border-indigo-500 bg-indigo-500/10 scale-[1.02]' 
-                    : 'border-slate-700 bg-slate-800/30 hover:border-slate-500 hover:bg-slate-800/50'
-                }
-            `}
+          className={`
+            border-2 border-dashed rounded-2xl p-8 md:p-12 text-center transition-all duration-300 mb-6
+            ${isDragging ? 'border-indigo-500 bg-indigo-500/10 scale-105' : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'}
+          `}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
-            <input 
-                ref={fileInputRef}
-                type="file" 
-                multiple 
-                // @ts-ignore - React doesn't fully type webkitdirectory yet
-                webkitdirectory={mode === 'FOLDER' ? "" : undefined}
-                // @ts-ignore
-                directory={mode === 'FOLDER' ? "" : undefined}
-                className="hidden" 
-                onChange={handleFileSelect}
-            />
-
-            <div className="flex flex-col items-center gap-4">
-                <div className={`p-4 rounded-full bg-slate-800 group-hover:bg-slate-700 transition-colors ${isDragging ? 'bg-indigo-900/50' : ''}`}>
-                    {mode === 'FOLDER' ? <Folder className="w-8 h-8 text-indigo-400" /> : <Upload className="w-8 h-8 text-indigo-400" />}
-                </div>
-                <div>
-                    <h3 className="text-xl font-semibold text-slate-200 mb-1">
-                        {mode === 'FOLDER' ? 'Select Folder' : 'Select Files'}
-                    </h3>
-                    <p className="text-slate-500">
-                        {isDragging ? 'Drop it here!' : 'Click to browse or drag and drop'}
-                    </p>
-                </div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="p-6 bg-indigo-500/10 rounded-full">
+              <Upload className="w-10 h-10 text-indigo-400" />
             </div>
+            <div>
+              <p className="text-lg text-slate-300 font-medium mb-1">
+                Drag & drop {mode === 'FILES' ? 'files' : 'a folder'} here
+              </p>
+              <p className="text-sm text-slate-500">or</p>
+            </div>
+            <button
+              onClick={triggerInput}
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-indigo-500/50"
+            >
+              Browse {mode === 'FILES' ? 'Files' : 'Folder'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple={mode === 'FILES'}
+              onChange={handleFileChange}
+              className="hidden"
+              {...(mode === 'FOLDER' ? { webkitdirectory: '', directory: '' } as any : {})}
+            />
+          </div>
         </div>
 
         {/* File List */}
         {files.length > 0 && (
-            <div className="mt-8">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        Ready to send ({files.length})
-                    </h3>
-                    <button 
-                        onClick={() => setFiles([])}
-                        className="text-sm text-red-400 hover:text-red-300"
-                    >
-                        Clear All
-                    </button>
-                </div>
-                
-                <div className="bg-slate-800/50 rounded-xl border border-slate-700 divide-y divide-slate-700 max-h-[300px] overflow-y-auto">
-                    {files.map((file, idx) => (
-                        <div key={idx} className="p-4 flex items-center justify-between hover:bg-slate-700/30 transition-colors">
-                            <div className="flex items-center gap-3 overflow-hidden">
-                                <div className="p-2 bg-slate-900 rounded-lg">
-                                    <File className="w-4 h-4 text-indigo-400"/>
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="text-sm font-medium text-slate-200 truncate pr-4">{file.webkitRelativePath || file.name}</p>
-                                    <p className="text-xs text-slate-500">{formatBytes(file.size)}</p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
-                                className="p-2 text-slate-500 hover:text-red-400 hover:bg-slate-700 rounded-full transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-                
-                {/* Receiver Selection */}
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-emerald-400" />
-                        Select Receiver
-                    </h3>
-                    
-                    {receivers.length === 0 ? (
-                        <div className="p-6 bg-slate-800/30 border border-slate-700 rounded-xl text-center">
-                            <AlertCircle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                            <p className="text-slate-400">No receivers available</p>
-                            <p className="text-sm text-slate-500 mt-1">Ask someone to open the app in Receive mode</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {receivers.map((receiver) => (
-                                <button
-                                    key={receiver.id}
-                                    onClick={() => setSelectedReceiver(receiver.id)}
-                                    className={`p-4 rounded-xl border-2 transition-all text-left ${
-                                        selectedReceiver === receiver.id
-                                            ? 'border-emerald-500 bg-emerald-500/10'
-                                            : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                            selectedReceiver === receiver.id ? 'bg-emerald-500/20' : 'bg-slate-700'
-                                        }`}>
-                                            <span className="text-lg">
-                                                {receiver.deviceType === 'MOBILE' ? '📱' : receiver.deviceType === 'TABLET' ? '📱' : '💻'}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-white">{receiver.name}</p>
-                                            <p className="text-xs text-slate-400">{receiver.deviceType}</p>
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                    <button 
-                        onClick={handleSendFiles}
-                        disabled={!selectedReceiver || uploading}
-                        className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
-                    >
-                        {uploading ? (
-                            <>
-                                <span>Sending... {Math.round(uploadProgress)}%</span>
-                            </>
-                        ) : (
-                            <>
-                                <SendIcon className="w-4 h-4" />
-                                <span>Send Files</span>
-                            </>
-                        )}
-                    </button>
-                </div>
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Selected Files ({files.length})</h3>
+              <button
+                onClick={() => setFiles([])}
+                className="text-sm text-slate-400 hover:text-red-400 transition-colors"
+              >
+                Clear All
+              </button>
             </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-slate-800/60 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors group"
+                >
+                  <div className="p-2 bg-indigo-500/20 rounded-lg">
+                    <File className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-200 truncate">{file.name}</p>
+                    <p className="text-xs text-slate-500">{formatBytes(file.size)}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFile(index)}
+                    className="p-2 text-slate-500 hover:text-red-400 hover:bg-slate-700 rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Receiver Selection */}
+        {files.length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Select Receiver
+            </h3>
+            
+            {receivers.length === 0 ? (
+              <div className="p-6 bg-slate-800/40 border border-slate-700 rounded-xl text-center">
+                <AlertCircle className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+                <p className="text-slate-400">No receivers available</p>
+                <p className="text-sm text-slate-500 mt-1">Ask someone to open the app in receive mode</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {receivers.map((receiver) => (
+                  <button
+                    key={receiver.id}
+                    onClick={() => setSelectedReceiver(receiver.id)}
+                    className={`
+                      p-4 rounded-xl border-2 transition-all text-left
+                      ${selectedReceiver === receiver.id
+                        ? 'border-emerald-500 bg-emerald-500/10'
+                        : 'border-slate-700 bg-slate-800/40 hover:border-slate-600'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${
+                        receiver.avatarId === 0 ? 'from-purple-500 to-pink-500' :
+                        receiver.avatarId === 1 ? 'from-blue-500 to-cyan-500' :
+                        receiver.avatarId === 2 ? 'from-green-500 to-emerald-500' :
+                        receiver.avatarId === 3 ? 'from-orange-500 to-red-500' :
+                        'from-indigo-500 to-purple-500'
+                      } flex items-center justify-center text-white font-bold`}>
+                        {receiver.name.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-white truncate">{receiver.name}</p>
+                        <p className="text-xs text-slate-400 capitalize">{receiver.deviceType}</p>
+                      </div>
+                      {selectedReceiver === receiver.id && (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Send Button */}
+        {files.length > 0 && selectedReceiver && (
+          <button
+            onClick={handleSend}
+            disabled={uploading}
+            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-500/50 flex items-center justify-center gap-3"
+          >
+            {uploading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Sending... {uploadProgress}%
+              </>
+            ) : (
+              <>
+                <SendIcon className="w-5 h-5" />
+                Send {files.length} {files.length === 1 ? 'File' : 'Files'}
+              </>
+            )}
+          </button>
         )}
       </div>
     </div>

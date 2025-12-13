@@ -3,6 +3,22 @@ import { DeviceType, UserProfile } from '../types';
 const ADJECTIVES = ['Cosmic', 'Swift', 'Neon', 'Digital', 'Silent', 'Brave', 'Hyper', 'Sonic', 'Rapid', 'Turbo'];
 const NOUNS = ['Falcon', 'Fox', 'Panda', 'Eagle', 'Badger', 'Wolf', 'Tiger', 'Shark', 'Otter', 'Lynx'];
 
+/**
+ * Generate a UUID v4 with fallback for browsers that don't support crypto.randomUUID
+ */
+export const generateUUID = (): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback implementation
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 export const generateRandomName = (): string => {
   const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
   const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];

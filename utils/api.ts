@@ -1,9 +1,18 @@
-"""
-API client configuration and endpoints
-"""
+/**
+ * API client configuration and endpoints
+ */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
+// Detect server URL dynamically from current location
+const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.protocol}//${window.location.host}`;
+  }
+  return 'http://localhost:8000';
+};
+
+const BASE_URL = getBaseURL();
+const API_BASE_URL = `${BASE_URL}/api`;
+const WS_BASE_URL = BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://') + '/ws';
 
 export const API_ENDPOINTS = {
   // Device endpoints
@@ -15,8 +24,8 @@ export const API_ENDPOINTS = {
   UPLOAD_FILE: `${API_BASE_URL}/files/upload`,
   UPLOAD_MULTIPLE: `${API_BASE_URL}/files/upload-multiple`,
   DOWNLOAD_TRANSFER: (transferId: string) => `${API_BASE_URL}/files/download/${transferId}`,
-  DOWNLOAD_FILE: (transferId: string, fileName: string) => 
-    `${API_BASE_URL}/files/download/${transferId}/${fileName}`,
+  DOWNLOAD_FILE: (transferId: string, filePath: string) => 
+    `${API_BASE_URL}/files/download/${transferId}/${encodeURIComponent(filePath)}`,
   
   // Transfer endpoints
   INITIATE_TRANSFER: `${API_BASE_URL}/transfers/initiate`,

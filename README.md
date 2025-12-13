@@ -298,7 +298,7 @@ We love contributions! ❤️ Whether it's bug fixes, new features, or documenta
 # 1. Fork the repository on GitHub
 
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/wl-drop.git
+git clone https://github.com/mv999exe/wl-drop.git
 
 # 3. Create a feature branch
 git checkout -b feature/AmazingFeature

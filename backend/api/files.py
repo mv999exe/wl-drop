@@ -160,58 +160,54 @@ async def upload_multiple_files(
 
 
 @router.get("/files/download/{transfer_id}")
-async def download_transfer(transfer_id: str, background_tasks: BackgroundTasks):
+async def download_transfer(transfer_id: str):
     """
-    Download all files in a transfer as a zip archive
+    Get list of files in a transfer for individual download
     """
     if transfer_id not in transfers_db:
         raise HTTPException(status_code=404, detail="Transfer not found")
     
-    transfer_dir = Path(settings.UPLOAD_DIR) / transfer_id
+    transfer = transfers_db[transfer_id]
     
-    if not transfer_dir.exists():
-        raise HTTPException(status_code=404, detail="Transfer files not found")
-    
-    # Create zip archive
-    zip_path = Path(settings.UPLOAD_DIR) / f"{transfer_id}.zip"
-    shutil.make_archive(
-        str(zip_path.with_suffix('')),
-        'zip',
-        str(transfer_dir)
-    )
-    
-    # Schedule cleanup after download
-    def cleanup():
-        try:
-            if zip_path.exists():
-                os.remove(zip_path)
-        except Exception as e:
-            print(f"Cleanup error: {e}")
-    
-    background_tasks.add_task(cleanup)
-    
-    return FileResponse(
-        zip_path,
-        media_type="application/zip",
-        filename=f"transfer_{transfer_id}.zip"
-    )
+    return {
+        "transferId": transfer_id,
+        "files": transfer.get("files", []),
+        "totalSize": transfer.get("totalSize", 0),
+        "status": transfer.get("status", "pending")
+    }
 
 
-@router.get("/files/download/{transfer_id}/{file_name}")
-async def download_single_file(transfer_id: str, file_name: str):
+@router.get("/files/download/{transfer_id}/{file_path:path}")
+async def download_single_file(transfer_id: str, file_path: str):
     """
-    Download a single file from a transfer
+    Download a single file from a transfer (supports nested paths)
     """
     transfer_dir = Path(settings.UPLOAD_DIR) / transfer_id
-    file_path = transfer_dir / file_name
+    full_file_path = transfer_dir / file_path
     
-    if not file_path.exists() or not file_path.is_file():
+    # Security: Ensure the file is within the transfer directory
+    try:
+        full_file_path = full_file_path.resolve()
+        transfer_dir = transfer_dir.resolve()
+        if not str(full_file_path).startswith(str(transfer_dir)):
+            raise HTTPException(status_code=403, detail="Access denied")
+    except:
+        raise HTTPException(status_code=403, detail="Invalid file path")
+    
+    if not full_file_path.exists() or not full_file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
     
+    # Get original filename
+    filename = full_file_path.name
+    
     return FileResponse(
-        file_path,
+        full_file_path,
         media_type="application/octet-stream",
-        filename=file_name
+        filename=filename,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Accept-Ranges": "bytes"
+        }
     )
 
 
@@ -227,29 +223,52 @@ async def get_transfer_info(transfer_id: str):
 
 
 @router.post("/transfers/initiate")
-async def initiate_transfer(request: TransferRequest):
+async def initiate_transfer(
+    sender_id: str = Form(...),
+    receiver_id: str = Form(...),
+    transfer_id: str = Form(...)
+):
     """
     Initiate a file transfer between devices
     """
-    transfer_id = str(uuid.uuid4())
+    # Get files from upload directory
+    transfer_dir = Path(settings.UPLOAD_DIR) / transfer_id
+    
+    if not transfer_dir.exists():
+        raise HTTPException(status_code=404, detail="Transfer files not found")
+    
+    # Collect file information
+    files_info = []
+    total_size = 0
+    
+    for file_path in transfer_dir.rglob('*'):
+        if file_path.is_file():
+            relative_path = file_path.relative_to(transfer_dir)
+            file_size = file_path.stat().st_size
+            files_info.append({
+                "name": file_path.name,
+                "path": str(relative_path),
+                "size": file_size
+            })
+            total_size += file_size
     
     # Create transfer record
     transfers_db[transfer_id] = {
         "id": transfer_id,
-        "senderId": request.senderId,
-        "receiverId": request.receiverId,
-        "files": request.files,
+        "senderId": sender_id,
+        "receiverId": receiver_id,
+        "files": files_info,
         "status": "pending",
-        "totalSize": sum(f.get("size", 0) for f in request.files),
+        "totalSize": total_size,
         "uploadedSize": 0
     }
     
     # Notify receiver via WebSocket
-    await ws_manager.send_personal_message(request.receiverId, {
+    await ws_manager.send_personal_message(receiver_id, {
         "type": "transfer_request",
         "transferId": transfer_id,
-        "from": request.senderId,
-        "files": request.files
+        "from": sender_id,
+        "files": files_info
     })
     
     return {

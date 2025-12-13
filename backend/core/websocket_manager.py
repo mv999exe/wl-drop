@@ -71,6 +71,8 @@ class WebSocketManager:
         """Handle incoming WebSocket messages"""
         msg_type = data.get("type")
         
+        print(f"📨 Message from {client_id}: type={msg_type}, data={data}")
+        
         if msg_type == "register":
             # Register device information
             self.devices[client_id] = {
@@ -81,13 +83,21 @@ class WebSocketManager:
                 "avatarId": data.get("avatarId", 0)
             }
             
+            print(f"✅ Registered device: {self.devices[client_id]}")
+            
             # Broadcast updated device list
             await self.broadcast_device_list()
         
         elif msg_type == "update_mode":
             # Update device mode (HOME, SEND, RECEIVE)
             if client_id in self.devices:
-                self.devices[client_id]["mode"] = data.get("mode", "HOME")
+                old_mode = self.devices[client_id]["mode"]
+                new_mode = data.get("mode", "HOME")
+                self.devices[client_id]["mode"] = new_mode
+                
+                print(f"🔄 Mode updated for {client_id}: {old_mode} → {new_mode}")
+                print(f"📋 All devices: {self.devices}")
+                
                 await self.broadcast_device_list()
         
         elif msg_type == "send_request":
@@ -138,6 +148,9 @@ class WebSocketManager:
     
     async def broadcast_device_list(self):
         """Broadcast device list to all clients"""
+        print(f"📢 Broadcasting device list to {len(self.active_connections)} clients")
+        print(f"   Devices: {list(self.devices.values())}")
+        
         for client_id in list(self.active_connections.keys()):
             await self.send_device_list(client_id)
     

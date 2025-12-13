@@ -70,26 +70,38 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 @app.get("/api/health")
 async def health_check():
     """Server health check"""
+    from backend.core.utils import get_local_ip
+    
+    local_ip = get_local_ip()
+    
     return {
         "status": "healthy",
         "version": "1.0.0",
-        "server": f"{settings.HOST}:{settings.PORT}"
+        "server": f"{local_ip}:{settings.PORT}"
     }
 
 
 # Serve React frontend
-if os.path.exists("../dist"):
-    app.mount("/assets", StaticFiles(directory="../dist/assets"), name="assets")
+DIST_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dist")
+
+if os.path.exists(DIST_DIR):
+    # Mount static assets
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
     
     @app.get("/{full_path:path}")
     async def serve_frontend(full_path: str):
-        """Serve React frontend for all routes"""
+        """Serve React frontend for all routes except /api and /ws"""
+        # Don't interfere with API routes
+        if full_path.startswith("api/") or full_path.startswith("ws/"):
+            return {"error": "Not found"}, 404
+            
         # If requesting a specific file in dist, serve it
-        file_path = f"../dist/{full_path}"
+        file_path = os.path.join(DIST_DIR, full_path)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
+            
         # Otherwise serve index.html (SPA routing)
-        return FileResponse("../dist/index.html")
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
 else:
     @app.get("/")
     async def root():

@@ -1,6 +1,6 @@
-"""
-WebSocket connection manager for real-time communication
-"""
+/**
+ * WebSocket connection manager for real-time communication
+ */
 
 import { getWebSocketURL } from './api';
 import { UserProfile } from '../types';

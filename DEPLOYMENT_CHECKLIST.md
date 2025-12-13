@@ -66,7 +66,7 @@ git add .
 git commit -m "Initial commit: WL-Drop v1.0.0"
 
 # Add remote repository
-git remote add origin https://github.com/YOUR_USERNAME/wl-drop.git
+git remote add origin https://github.com/mv999exe/wl-drop.git
 
 # Push to GitHub
 git push -u origin main

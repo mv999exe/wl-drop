@@ -504,7 +504,7 @@ git commit -m "Initial commit: WL-Drop v1.0.0"
 ### 4. GitHub Deployment
 ```bash
 # Create repo on GitHub, then:
-git remote add origin https://github.com/YOUR_USERNAME/wl-drop.git
+git remote add origin https://github.com/mv999exe/wl-drop.git
 git push -u origin main
 ```
 

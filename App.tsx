@@ -6,7 +6,7 @@ import SenderView from './components/SenderView';
 import ReceiverView from './components/ReceiverView';
 import { Send, Download, Zap, CloudOff, Wifi, Copy, Check } from 'lucide-react';
 import { AppMode, UserProfile, DeviceType } from './types';
-import { detectDeviceType, generateRandomName, storage } from './utils/helpers';
+import { detectDeviceType, generateRandomName, generateUUID, storage } from './utils/helpers';
 import { WebSocketClient } from './utils/websocket';
 import { getServerURL, API_ENDPOINTS } from './utils/api';
 
@@ -29,7 +29,7 @@ function App() {
     // 3. Create if not exists or update device type
     if (!currentUser) {
       currentUser = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         name: generateRandomName(),
         deviceType: currentDevice,
         avatarId: Math.floor(Math.random() * 5)
@@ -194,6 +194,16 @@ function App() {
             <div className="mt-16 flex items-center gap-6 text-slate-500 text-sm">
               <div className="flex items-center gap-2" title="Transfers happen on local network">
                 <Zap className="w-4 h-4 text-yellow-500" />
+                <span>Lightning Fast</span>
+              </div>
+              <div className="flex items-center gap-2" title="Files never leave your network">
+                <CloudOff className="w-4 h-4 text-indigo-500" />
+                <span>No Cloud</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* VIEW: SEND */}
         {mode === AppMode.SEND && (
           <SenderView 
@@ -210,17 +220,6 @@ function App() {
             user={user}
             wsClient={wsClient.current}
           />
-        )}</div>
-        )}
-
-        {/* VIEW: SEND */}
-        {mode === AppMode.SEND && (
-          <SenderView onBack={() => setMode(AppMode.HOME)} />
-        )}
-
-        {/* VIEW: RECEIVE */}
-        {mode === AppMode.RECEIVE && (
-          <ReceiverView onBack={() => setMode(AppMode.HOME)} />
         )}
 
       </main>
