@@ -7,10 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node.js
 node_modules
-dist
 dist-ssr
 *.local
+
+# Frontend build - KEEP dist/ in git for releases
+# dist/  # Commented out - we include dist in git for easy distribution
 
 # Editor directories and files
 .vscode/*
@@ -64,3 +67,10 @@ uploads/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# PyInstaller
+build/
+*.spec.bak
+
+# Release builds
+release/

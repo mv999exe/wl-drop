@@ -52,6 +52,11 @@ echo ""
 echo "📦 Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Install PyInstaller for building distributions
+echo "📦 Installing PyInstaller (for building executables)..."
+pip install pyinstaller
+
 echo "✅ Python dependencies installed"
 
 # Install Node.js dependencies and build frontend (if Node.js is available)

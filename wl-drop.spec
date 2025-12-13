@@ -7,9 +7,9 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ('dist', 'dist'),
-        ('backend', 'backend'),
-        ('.env.example', '.')
+        ('dist', 'dist'),  # Frontend build files
+        ('backend', 'backend'),  # Backend Python files
+        ('uploads', 'uploads'),  # Uploads directory (empty template)
     ],
     hiddenimports=[
         'uvicorn.logging',
@@ -25,7 +25,12 @@ a = Analysis(
         'websockets.legacy',
         'websockets.legacy.server',
         'websockets.legacy.client',
-        'engineio.async_drivers.aiohttp'
+        'fastapi',
+        'pydantic',
+        'pydantic_settings',
+        'pydantic_core',
+        'aiofiles',
+        'python_multipart',
     ],
     hookspath=[],
     hooksconfig={},
@@ -58,5 +63,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='logo.ico'
 )

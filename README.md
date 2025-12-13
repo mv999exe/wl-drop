@@ -58,22 +58,29 @@ Share files **instantly** across devices on your local network. No cloud, no siz
 
 ## 🚀 Quick Start
 
-### 📋 Prerequisites
+### � For End Users (No Installation Required!)
 
-<table>
-<tr>
-<td><b>Python 3.8+</b></td>
-<td><a href="https://www.python.org/downloads/">Download Python</a></td>
-</tr>
-<tr>
-<td><b>Node.js 16+</b></td>
-<td><a href="https://nodejs.org/">Download Node.js</a> (optional - for development)</td>
-</tr>
-</table>
+**Want to use WL-Drop without any technical setup?**
 
-### ⚙️ Installation
+1. **Download** the ready-to-use version for your system:
+   - 🪟 **Windows**: Download `wl-drop-windows-x64.zip` from [Releases](https://github.com/mv999exe/wl-drop/releases)
+   - 🐧 **Linux**: Download `wl-drop-linux-x64.tar.gz` from [Releases](https://github.com/mv999exe/wl-drop/releases)
 
-<details open>
+2. **Extract** the downloaded file
+
+3. **Run**:
+   - 🪟 Windows: Double-click `WL-Drop.bat`
+   - 🐧 Linux: Run `./run.sh`
+
+4. **Done!** Your browser opens automatically at `http://localhost:8000`
+
+> ✨ **No Python, Node.js, or technical knowledge required!**
+
+---
+
+### 👨‍💻 For Developers (Source Code Installation)
+
+<details>
 <summary><b>🐧 Linux / 🍎 macOS</b></summary>
 
 ```bash

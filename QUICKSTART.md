@@ -1,8 +1,46 @@
 # 🚀 Quick Start Guide
 
-## Installation
+## For End Users 👥
 
-### 1. Install Python Dependencies
+### Download Pre-built Version (Recommended)
+
+**No installation or technical knowledge required!**
+
+1. **Download** from [GitHub Releases](https://github.com/mv999exe/wl-drop/releases):
+   - 🪟 **Windows**: `wl-drop-windows-x64.zip`
+   - 🐧 **Linux**: `wl-drop-linux-x64.tar.gz`
+
+2. **Extract** the downloaded file to any folder
+
+3. **Run**:
+   - 🪟 **Windows**: Double-click `WL-Drop.bat`
+   - 🐧 **Linux**: Open terminal, run `./run.sh`
+
+4. **Use**: Browser opens automatically, or visit `http://localhost:8000`
+
+That's it! Share the Network URL shown with other devices on your WiFi.
+
+---
+
+## For Developers 👨‍💻
+
+### Method 1: Using Install Scripts (Easiest)
+
+#### Linux/macOS
+```bash
+./install.sh  # Installs everything
+./start.sh    # Starts the server
+```
+
+#### Windows
+```cmd
+install.bat   # Installs everything
+start.bat     # Starts the server
+```
+
+### Method 2: Manual Installation
+
+#### 1. Install Python Dependencies
 
 ```bash
 # Create virtual environment (optional but recommended)
@@ -13,7 +51,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Build Frontend (optional - for development)
+#### 2. Build Frontend (optional - for development)
 
 ```bash
 # Install Node.js dependencies
@@ -23,9 +61,9 @@ npm install
 npm run build
 ```
 
-## Running the Server
+### Running the Server
 
-### Simple Method
+#### Simple Method
 
 ```bash
 python run.py
@@ -33,11 +71,31 @@ python run.py
 
 The server will start on `http://0.0.0.0:8000` and display your network IP.
 
-### Development Mode (with auto-reload)
+#### Development Mode (with auto-reload)
 
 ```bash
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+---
+
+## Building for Distribution
+
+Want to create standalone executables?
+
+```bash
+# Linux
+./build.sh
+
+# Windows
+build.bat
+```
+
+This creates ready-to-distribute packages in the `release/` folder.
+
+See [BUILD.md](BUILD.md) for detailed build instructions.
+
+---
 
 ## Testing
 

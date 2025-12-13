@@ -34,6 +34,11 @@ echo Installing Python dependencies...
 call .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
+REM Install PyInstaller for building distributions
+echo Installing PyInstaller (for building executables)...
+pip install pyinstaller
+
 echo Python dependencies installed!
 echo.
 
