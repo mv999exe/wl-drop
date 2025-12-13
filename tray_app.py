@@ -7,6 +7,7 @@ import sys
 import os
 import subprocess
 import time
+import threading
 import webbrowser
 from pathlib import Path
 
@@ -91,16 +92,30 @@ class WLDropTray:
                     cwd=str(script_dir)
                 )
             
+            # Wait a bit and verify server actually started
+            time.sleep(1)
+            if self.server_process.poll() is not None:
+                # Process died immediately - read error
+                stdout, stderr = self.server_process.communicate(timeout=1)
+                error_msg = stderr.decode() if stderr else stdout.decode()
+                print(f"❌ Server failed to start: {error_msg}")
+                self.server_process = None
+                self.is_running = False
+                self.update_icon_menu()
+                return
+            
+            # Server is running
             self.is_running = True
             self.update_icon_menu()
             print("✅ Server started")
             
             # Wait a moment then open browser
-            time.sleep(2)
+            time.sleep(1)
             webbrowser.open(self.base_url)
             
         except Exception as e:
             print(f"❌ Error starting server: {e}")
+            self.server_process = None
             self.is_running = False
             self.update_icon_menu()
     
@@ -173,6 +188,26 @@ class WLDropTray:
         
         # Start server automatically
         self.start_server()
+        
+        # Setup periodic server check
+        import threading
+        def check_server_status():
+            while True:
+                time.sleep(5)  # Check every 5 seconds
+                if self.server_process and self.server_process.poll() is not None:
+                    # Server process died
+                    if self.is_running:
+                        print("⚠️ Server process died unexpectedly")
+                        self.server_process = None
+                        self.is_running = False
+                        self.update_icon_menu()
+                elif not self.server_process and self.is_running:
+                    # Inconsistent state
+                    self.is_running = False
+                    self.update_icon_menu()
+        
+        monitor_thread = threading.Thread(target=check_server_status, daemon=True)
+        monitor_thread.start()
         
         # Run the icon (this blocks until quit)
         self.icon.run()
