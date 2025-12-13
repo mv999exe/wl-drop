@@ -178,9 +178,10 @@ async def download_transfer(transfer_id: str):
 
 
 @router.get("/files/download/{transfer_id}/{file_path:path}")
-async def download_single_file(transfer_id: str, file_path: str):
+async def download_single_file(transfer_id: str, file_path: str, background_tasks: BackgroundTasks):
     """
     Download a single file from a transfer (supports nested paths)
+    File and transfer directory will be deleted after successful download
     """
     transfer_dir = Path(settings.UPLOAD_DIR) / transfer_id
     full_file_path = transfer_dir / file_path
@@ -199,6 +200,22 @@ async def download_single_file(transfer_id: str, file_path: str):
     
     # Get original filename
     filename = full_file_path.name
+    
+    # Schedule cleanup after download completes
+    def cleanup_after_download():
+        try:
+            # Delete the entire transfer directory after download
+            if transfer_dir.exists():
+                shutil.rmtree(transfer_dir)
+                print(f"🗑️  Auto-deleted transfer directory: {transfer_id}")
+            
+            # Remove from database
+            if transfer_id in transfers_db:
+                del transfers_db[transfer_id]
+        except Exception as e:
+            print(f"Cleanup error for {transfer_id}: {e}")
+    
+    background_tasks.add_task(cleanup_after_download)
     
     return FileResponse(
         full_file_path,

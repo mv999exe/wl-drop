@@ -19,9 +19,6 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE: int = 10 * 1024 * 1024 * 1024  # 10GB
     CHUNK_SIZE: int = 1024 * 1024  # 1MB chunks
     
-    # Cleanup settings
-    AUTO_CLEANUP_HOURS: int = 24  # Auto delete files after 24 hours
-    
     # CORS
     CORS_ORIGINS: list = ["*"]
     

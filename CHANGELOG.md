@@ -5,6 +5,26 @@ All notable changes to WL-Drop will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-13
+
+### Changed
+- 🗑️ **BREAKING**: Files are now deleted immediately after successful download
+- ♻️ Replaced time-based cleanup service with instant cleanup after transfer completion
+- 🎯 More professional approach: no files left behind after successful transfers
+- 🔧 Simplified cleanup service to manual utilities only
+
+### Removed
+- ❌ Automatic hourly cleanup service (replaced with instant cleanup)
+- ❌ AUTO_CLEANUP_HOURS configuration setting (no longer needed)
+
+### Technical Details
+- Background tasks now handle cleanup after each download
+- Transfer directories deleted immediately upon successful file download
+- Reduced server maintenance overhead
+- Cleaner uploads folder management
+
+---
+
 ## [1.0.0] - 2025-12-13
 
 ### Added

@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="WL-Drop API",
     description="Local file sharing backend",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan
 )
 
@@ -76,7 +76,7 @@ async def health_check():
     
     return {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "server": f"{local_ip}:{settings.PORT}"
     }
 
