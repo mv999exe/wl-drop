@@ -14,7 +14,7 @@
 
 Share files **instantly** across devices on your local network. No cloud, no size limits, just blazing-fast peer-to-peer transfers.
 
-[📥 **Download & Official Website**](https://mv999exe.github.io/wldrop/)
+<a href="https://mv999exe.github.io/wldrop/" target="_blank">📥 <strong>Download & Official Website</strong></a>
 
 [✨ Features](#-features) • [🚀 Quick Start](#-quick-start) • [📖 Documentation](#-documentation) • [🤝 Contributing](#-contributing)
 
