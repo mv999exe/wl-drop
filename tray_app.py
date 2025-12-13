@@ -34,23 +34,24 @@ class WLDropTray:
         self.base_url = "http://localhost:8000"
         
     def create_icon_image(self):
-        """Create a simple icon image"""
-        # Create 64x64 icon with WL-Drop logo colors
+        """Create lightning bolt icon matching website design"""
         width = 64
         height = 64
-        image = Image.new('RGB', (width, height), '#4F46E5')  # Indigo background
+        image = Image.new('RGBA', (width, height), (99, 102, 241, 255))  # #6366f1
         draw = ImageDraw.Draw(image)
         
-        # Draw a simple "WL" text-like shape
-        # Draw W
-        draw.polygon([
-            (10, 15), (15, 15), (20, 40), (25, 15), (30, 15),
-            (27, 50), (23, 50), (20, 30), (17, 50), (13, 50)
-        ], fill='white')
-        
-        # Draw L
-        draw.rectangle([35, 15, 40, 50], fill='white')
-        draw.rectangle([35, 45, 50, 50], fill='white')
+        # Lightning bolt (scaled from 24x24 SVG path)
+        scale = width / 24.0
+        lightning = [
+            (13 * scale, 3 * scale),
+            (13 * scale, 10 * scale),
+            (4 * scale, 14 * scale),
+            (11 * scale, 14 * scale),
+            (11 * scale, 21 * scale),
+            (20 * scale, 10 * scale),
+            (13 * scale, 10 * scale),
+        ]
+        draw.polygon(lightning, fill='white')
         
         return image
     

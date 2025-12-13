@@ -1,71 +1,49 @@
 """
 Create WL-Drop icon (.ico file)
+Lightning bolt design matching https://mv999exe.github.io/wldrop-website/
 """
 
-from PIL import Image, ImageDraw, ImageFont
-import os
+from PIL import Image, ImageDraw
 
 def create_wl_drop_icon():
-    """Create a professional WL-Drop icon"""
+    """Create lightning bolt icon with indigo background"""
     
-    # Create multiple sizes for ICO file
+    # Colors from website: #6366f1 (Indigo-500)
     sizes = [256, 128, 64, 48, 32, 16]
     images = []
     
     for size in sizes:
         # Create image with indigo background
-        img = Image.new('RGBA', (size, size), (79, 70, 229, 255))  # #4F46E5
+        img = Image.new('RGBA', (size, size), (99, 102, 241, 255))
         draw = ImageDraw.Draw(img)
         
-        # Add gradient effect (lighter at top)
-        for y in range(size):
-            alpha = int(255 * (1 - y / size * 0.3))
-            draw.line([(0, y), (size, y)], fill=(99, 102, 241, alpha))
+        # Scale factor for the lightning bolt
+        scale = size / 24.0
         
-        # Draw rounded rectangle background
-        margin = size // 8
-        draw.rounded_rectangle(
-            [margin, margin, size - margin, size - margin],
-            radius=size // 8,
-            fill=(79, 70, 229, 255)
-        )
-        
-        # Draw "WL" text
-        if size >= 64:
-            # For larger icons, draw detailed logo
-            font_size = size // 3
-            
-            # Draw W
-            w_points = [
-                (margin * 1.5, margin * 2),
-                (margin * 2, margin * 2),
-                (size // 2 - margin // 2, size - margin * 2),
-                (size // 2, margin * 2),
-                (size // 2 + margin // 2, margin * 2),
-                (size // 2 + margin // 4, size - margin * 2),
-                (size // 2, size - margin * 3),
-                (size // 2 - margin // 4, size - margin * 2),
+        # Lightning bolt path from SVG: M13 10V3L4 14h7v7l9-11h-7z
+        if size >= 32:
+            lightning = [
+                (13 * scale, 3 * scale),
+                (13 * scale, 10 * scale),
+                (4 * scale, 14 * scale),
+                (11 * scale, 14 * scale),
+                (11 * scale, 21 * scale),
+                (20 * scale, 10 * scale),
+                (13 * scale, 10 * scale),
             ]
-            draw.polygon(w_points, fill='white')
-            
-            # Draw L
-            l_width = margin
-            l_height = size - margin * 4
-            draw.rectangle(
-                [size - margin * 4, margin * 2, size - margin * 3, size - margin * 2],
-                fill='white'
-            )
-            draw.rectangle(
-                [size - margin * 4, size - margin * 2.5, size - margin * 1.5, size - margin * 2],
-                fill='white'
-            )
+            draw.polygon(lightning, fill='white')
         else:
-            # For smaller icons, simple white square
-            small_margin = size // 4
-            draw.rectangle(
-                [small_margin, small_margin, size - small_margin, size - small_margin],
-                fill='white'
-            )
+            # Simplified for very small sizes
+            cx, w = size/2, size*0.15
+            lightning = [
+                (cx, size*0.15),
+                (cx-w, size*0.5),
+                (cx+w*0.5, size*0.5),
+                (cx-w*0.5, size*0.85),
+                (cx+w, size*0.45),
+                (cx, size*0.45),
+            ]
+            draw.polygon(lightning, fill='white')
         
         images.append(img)
     

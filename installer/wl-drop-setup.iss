@@ -60,16 +60,16 @@ Source: "..\installer\WL-Drop-Silent.bat"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\installer\WL-Drop.vbs"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"
+Name: "{group}\{#MyAppName}"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\WL-Drop.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: quicklaunchicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\WL-Drop.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{sys}\wscript.exe"; Parameters: """{app}\WL-Drop.vbs"""; WorkingDir: "{app}"; IconFilename: "{app}\logo.ico"; Tasks: quicklaunchicon
 
 [Run]
 ; Install Python dependencies (pip is already installed in CurStepChanged)
 Filename: "{app}\python\python.exe"; Parameters: "-m pip install --no-warn-script-location -r ""{app}\requirements.txt"""; StatusMsg: "Installing Python dependencies..."; Flags: runhidden
 ; Offer to launch after installation
-Filename: "{app}\WL-Drop.vbs"; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{sys}\wscript.exe"; Parameters: """{app}\WL-Drop.vbs"""; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 var
