@@ -87,7 +87,6 @@ jobs:
       - name: Copy Launcher Files
         run: |
           Copy-Item "installer\WL-Drop-Launcher.bat" -Destination "."
-          Copy-Item "installer\WL-Drop-Silent.bat" -Destination "."
           Copy-Item "installer\WL-Drop.vbs" -Destination "."
         shell: pwsh
       
