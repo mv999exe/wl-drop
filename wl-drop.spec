@@ -9,7 +9,6 @@ a = Analysis(
     datas=[
         ('dist', 'dist'),  # Frontend build files
         ('backend', 'backend'),  # Backend Python files
-        ('uploads', 'uploads'),  # Uploads directory (empty template)
     ],
     hiddenimports=[
         'uvicorn.logging',
