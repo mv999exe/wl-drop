@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src=".github/assets/logo.svg" alt="WL-Drop Logo" width="120" height="120">
+<img src="logo.png" alt="WL-Drop Logo" width="120" height="120">
 
 # ⚡ WL-Drop
 
