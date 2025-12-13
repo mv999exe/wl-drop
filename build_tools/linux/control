@@ -1,0 +1,15 @@
+Package: wl-drop
+Version: {{VERSION}}
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: mv999exe <mv999exe@github.com>
+Description: Fast, Secure, Local File Sharing - No Cloud Required
+ WL-Drop enables instant file sharing across devices on your local network
+ without internet access or cloud storage.
+ .
+ Features:
+ - Lightning fast peer-to-peer transfers
+ - No size limits
+ - Secure local network operation
+ - Cross-platform support

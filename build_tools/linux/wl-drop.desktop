@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=WL-Drop
+Comment=Fast, Secure, Local File Sharing
+Exec=/usr/bin/wl-drop
+Icon=wl-drop
+Terminal=true
+Type=Application
+Categories=Utility;Network;
+Keywords=file;sharing;local;network;drop;
+StartupNotify=true
