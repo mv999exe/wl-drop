@@ -28,6 +28,14 @@ class WLDropTray:
         self.is_running = False
         self.base_url = "http://localhost:8000"
         
+        # Setup paths
+        self.script_dir = Path(__file__).parent
+        self.python_exe = self.script_dir / "python" / "python.exe"
+        
+        # Use system Python if embedded not found (development mode)
+        if not self.python_exe.exists():
+            self.python_exe = Path(sys.executable)
+        
     def load_icon_image(self):
         """Load the official WL-Drop logo"""
         try:
@@ -51,6 +59,49 @@ class WLDropTray:
         image = Image.new('RGBA', (64, 64), (99, 102, 241, 255))
         return image
     
+    def check_and_install_dependencies(self):
+        """Check if dependencies are installed, install if missing"""
+        try:
+            print("🔍 Checking dependencies...")
+            
+            # Try importing fastapi
+            result = subprocess.run(
+                [str(self.python_exe), "-c", "import fastapi"],
+                capture_output=True,
+                timeout=5
+            )
+            
+            if result.returncode != 0:
+                print("📦 Installing dependencies... This may take a minute.")
+                
+                # Install requirements
+                requirements_file = self.script_dir / "requirements.txt"
+                if requirements_file.exists():
+                    install_result = subprocess.run(
+                        [str(self.python_exe), "-m", "pip", "install", 
+                         "--no-warn-script-location", "-r", str(requirements_file)],
+                        capture_output=True,
+                        timeout=120
+                    )
+                    
+                    if install_result.returncode != 0:
+                        error_msg = install_result.stderr.decode() if install_result.stderr else ""
+                        print(f"❌ Failed to install dependencies: {error_msg}")
+                        return False
+                    
+                    print("✅ Dependencies installed successfully")
+                else:
+                    print("⚠️ requirements.txt not found")
+                    return False
+            else:
+                print("✅ Dependencies OK")
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error checking dependencies: {e}")
+            return False
+    
     def start_server(self, icon=None, item=None):
         """Start the WL-Drop server"""
         if self.server_process and self.server_process.poll() is None:
@@ -58,17 +109,28 @@ class WLDropTray:
             return
         
         try:
-            script_dir = Path(__file__).parent
-            python_exe = script_dir / "python" / "python.exe"
-            run_script = script_dir / "run.py"
-            
-            # Check if we're in development or production
-            if not python_exe.exists():
-                python_exe = sys.executable
+            # Check and install dependencies first
+            if not self.check_and_install_dependencies():
+                print("❌ Cannot start server: dependency check failed")
+                self.is_running = False
+                self.update_icon_menu()
+                return
             
             # Create uploads directory
-            uploads_dir = script_dir / "uploads"
+            uploads_dir = self.script_dir / "uploads"
             uploads_dir.mkdir(exist_ok=True)
+            
+            print("🚀 Starting WL-Drop server...")
+            
+            # Start uvicorn directly - more professional and reliable
+            cmd = [
+                str(self.python_exe),
+                "-m", "uvicorn",
+                "backend.main:app",
+                "--host", "0.0.0.0",
+                "--port", "8000",
+                "--log-level", "info"
+            ]
             
             # Start server process (hidden on Windows)
             if sys.platform == "win32":
@@ -77,19 +139,19 @@ class WLDropTray:
                 startupinfo.wShowWindow = 0  # SW_HIDE
                 
                 self.server_process = subprocess.Popen(
-                    [str(python_exe), str(run_script)],
+                    cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     startupinfo=startupinfo,
                     creationflags=subprocess.CREATE_NO_WINDOW,
-                    cwd=str(script_dir)
+                    cwd=str(self.script_dir)
                 )
             else:
                 self.server_process = subprocess.Popen(
-                    [str(python_exe), str(run_script)],
+                    cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    cwd=str(script_dir)
+                    cwd=str(self.script_dir)
                 )
             
             # Wait a bit and verify server actually started
