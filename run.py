@@ -127,6 +127,16 @@ def main():
     • Press {Colors.WARNING}Ctrl+C{Colors.ENDC} to stop the server
     • Server auto-shuts down when browser tab closes
 
+{Colors.BOLD}⚠️  Cannot connect from other devices?{Colors.ENDC}
+    {Colors.WARNING}This is usually a firewall issue!{Colors.ENDC}
+    
+    {Colors.BOLD}Quick Fix:{Colors.ENDC}
+    • Windows: Allow Python through Windows Firewall
+    • Linux:   {Colors.OKCYAN}sudo ufw allow {args.port}/tcp{Colors.ENDC}
+    • macOS:   Add Python to Firewall exceptions
+    
+    📖 See NETWORK_TROUBLESHOOTING.md for detailed help
+
 {Colors.OKCYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.ENDC}
 """)
     

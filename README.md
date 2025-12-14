@@ -163,7 +163,20 @@ graph LR
 
 ---
 
-### 📥 **Receiving Files**
+### � **Cannot Connect from Other Devices?**
+
+**This is usually a firewall issue!** See [NETWORK_TROUBLESHOOTING.md](NETWORK_TROUBLESHOOTING.md) for detailed solutions.
+
+**Quick Fixes:**
+- **Windows:** Allow Python through Windows Firewall (Settings → Firewall → Allow an app)
+- **Linux:** `sudo ufw allow 8000/tcp`
+- **macOS:** System Preferences → Security & Privacy → Firewall → Allow Python
+
+> 🎯 **95% of connection issues are solved by opening the firewall!**
+
+---
+
+### �📥 **Receiving Files**
 
 <div align="center">
 
