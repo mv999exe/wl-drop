@@ -25,6 +25,8 @@ a = Analysis(
         'websockets.legacy.server',
         'websockets.legacy.client',
         'fastapi',
+        'fastapi.staticfiles',
+        'starlette.staticfiles',
         'pydantic',
         'pydantic_settings',
         'pydantic_core',
